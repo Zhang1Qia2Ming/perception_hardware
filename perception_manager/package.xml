@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>perception_hardware</name>
+  <version>0.1.0</version>
+  <description>Unified hardware abstraction layer for Orin platform.</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rclcpp_lifecycle</depend>
+  <depend>hardware_interface</depend>
+  <depend>pluginlib</depend>
+  
+  <depend>cv_bridge</depend>
+  <depend>opencv</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>yaml-cpp</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <hardware_interface plugin="${prefix}/perception_hardware_plugins.xml"/>
+  </export>
+</package>

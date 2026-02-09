@@ -1,0 +1,8 @@
+<library path="perception_hardware">  
+    <class 
+        name="perception_hardware/PerceptionSystem" 
+        type="perception_hardware::PerceptionSystem"
+        base_class_type="hardware_interface::SystemInterface">
+        <description>Perception system hardware interface</description>
+    </class>
+</library>

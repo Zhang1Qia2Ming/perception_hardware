@@ -1,0 +1,7 @@
+<library path="libfake_hw_interface">
+<class name="fake_hw_interface/FakeSystem"
+type="fake_hw_interface::FakeSystem"
+base_class_type="hardware_interface::SystemInterface">
+<description>Fake hardware system for testing</description>
+</class>
+</library>
