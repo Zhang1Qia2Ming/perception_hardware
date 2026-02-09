@@ -115,6 +115,36 @@
     
     <state_interface name="data_ptr"/>
   </sensor>
+
+  <!-- <sensor name="camera_left">
+    <param name="device_type">mock_camera</param>
+    <param name="video_device">/dev/video0</param>
+    <param name="image_width">640</param>
+    <param name="image_height">480</param>
+    <param name="framerate">30.0</param>
+    <param name="pixel_format">mjpeg</param>
+    <param name="camera_frame_id">camera_link</param>
+    <param name="output_mode">screen</param>
+    <param name="fx">500.0</param><param name="fy">500.0</param>
+    <param name="cx">320.0</param><param name="cy">240.0</param>
+    
+    <state_interface name="data_ptr"/>
+  </sensor> -->
+
+  <!-- <sensor name="camera_right">
+    <param name="device_type">mock_camera</param>
+    <param name="video_device">/dev/video0</param>
+    <param name="image_width">640</param>
+    <param name="image_height">480</param>
+    <param name="framerate">30.0</param>
+    <param name="pixel_format">mjpeg</param>
+    <param name="camera_frame_id">camera_link</param>
+    <param name="output_mode">screen</param>
+    <param name="fx">500.0</param><param name="fy">500.0</param>
+    <param name="cx">320.0</param><param name="cy">240.0</param>
+    
+    <state_interface name="data_ptr"/>
+  </sensor> -->
 </ros2_control>
 
 

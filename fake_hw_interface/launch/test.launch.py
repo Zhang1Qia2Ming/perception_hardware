@@ -82,7 +82,7 @@ def generate_launch_description():
     test_mock_camera_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["test_mock_camera_controller", "--controller-manager", "/controller_manager"],
+        arguments=["test_mock_many_cameras_controller", "--controller-manager", "/controller_manager"],
     )
 
 
