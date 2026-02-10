@@ -85,7 +85,15 @@ def generate_launch_description():
         arguments=["test_mock_many_cameras_controller", "--controller-manager", "/controller_manager"],
     )
 
+    test_t265_front_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["test_t265_camera_controller", "--controller-manager", "/controller_manager"],
+    )
 
-    ld = LaunchDescription(declared_arguments + [control_node, robot_state_pub_node, test_mock_camera_controller_spawner])
+    ld = LaunchDescription(declared_arguments + [control_node, 
+    robot_state_pub_node, 
+    test_mock_camera_controller_spawner, 
+    test_t265_front_controller_spawner])
     return ld
 

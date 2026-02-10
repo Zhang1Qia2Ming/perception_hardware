@@ -63,9 +63,9 @@ namespace perception_hardware {
                 data_ptr_address_ = static_cast<double>(reinterpret_cast<uintptr_t>(&data_));
                 
                 // 
-                RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
-                                     "Controller Link Active! Sensor [%s] data_ptr address: 0x%lx", 
-                                     name_.c_str(), data_ptr_address_);
+                // RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
+                //                      "Controller Link Active! Sensor [%s] data_ptr address: 0x%lx", 
+                //                      name_.c_str(), data_ptr_address_);
 
                 return true;
             }
@@ -77,9 +77,9 @@ namespace perception_hardware {
                     data_.timestamp_nanos = time.nanoseconds();
                 }
 
-                RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
-                                     "Raw Buffer Address: %p", 
-                                     (void*)(data_.image.data));
+                // RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
+                //                      "Raw Buffer Address: %p", 
+                //                      (void*)(data_.image.data));
 
                 // // 1. 如果图像还没初始化，先初始化一个黑底画布
                 // if (data_.image.empty()) {

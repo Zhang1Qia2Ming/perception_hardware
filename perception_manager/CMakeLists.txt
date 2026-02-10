@@ -13,6 +13,9 @@ find_package(OpenCV REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
+set(REALSENSE2_LIBRARY "/usr/local/lib/librealsense2.so")
+set(REALSENSE2_INCLUDE_DIRS "/usr/local/include")
+
 # 3. 编译硬件接口库
 # 注意：如果你的 MockCamera 或 DeviceFactory 有单独的 .cpp 文件，也要加在这里
 add_library(${PROJECT_NAME} SHARED
@@ -22,6 +25,7 @@ add_library(${PROJECT_NAME} SHARED
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
+  ${REALSENSE2_INCLUDE_DIRS}
 )
 
 # 4. 依赖注入
@@ -29,11 +33,14 @@ ament_target_dependencies(${PROJECT_NAME}
   rclcpp
   rclcpp_lifecycle
   hardware_interface
+  #realsense2_camera_msgs
   pluginlib
   OpenCV
   cv_bridge
   sensor_msgs
 )
+
+target_link_libraries(${PROJECT_NAME} ${REALSENSE2_LIBRARY})
 
 # 5. 导出插件描述文件
 pluginlib_export_plugin_description_file(

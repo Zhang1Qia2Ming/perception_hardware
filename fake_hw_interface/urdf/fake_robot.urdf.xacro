@@ -116,6 +116,18 @@
     <state_interface name="data_ptr"/>
   </sensor>
 
+  <sensor name="t265_front">
+    <param name="device_type">t265_camera</param>
+    <param name="serial_no">224622110353</param>
+    <param name="usb_port_id">4-1</param>
+    <param name="wait_for_device_timeout">-1.0</param>
+    <param name="reconnect_timeout">6.0</param>
+    <param name="initial_reset">true</param>
+
+    <state_interface name="data_ptr"/>
+  </sensor>
+
+
   <!-- <sensor name="camera_left">
     <param name="device_type">mock_camera</param>
     <param name="video_device">/dev/video0</param>

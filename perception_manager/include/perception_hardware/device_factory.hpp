@@ -7,6 +7,8 @@
 #include "perception_hardware/device_base.hpp"
 #include "mock_device/mock_camera_device.hpp"
 #include "mock_device/mock_camera_data.hpp"
+#include "perception_hardware/t265_camera_device.hpp"
+#include "perception_hardware/t265_camera_data.hpp"
 
 namespace perception_hardware {
 
@@ -16,7 +18,11 @@ class DeviceFactory {
         static std::unique_ptr<DeviceBase> create(const std::string & device_type) {
             if (device_type == "mock_camera") {
                 return std::make_unique<MockCameraDevice>();
+            } else if (device_type == "t265_camera") {
+                return std::make_unique<T265CameraDevice>();
             }
+
+
 
             return nullptr;
         }
