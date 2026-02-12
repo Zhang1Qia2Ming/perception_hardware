@@ -60,10 +60,12 @@ namespace perception_hardware {
                 return port_id;
             }
 
+            void frame_callback(const rs2::frame& f);
+
         public:
             bool on_init(const hardware_interface::ComponentInfo & info) override {
                 name_ = info.name;
-                auto logger = rclcpp::get_logger("T265_SensorAPI");
+                auto logger = rclcpp::get_logger("T265CameraDevice");
 
                 try {
                     serial_no_ = info.parameters.at("serial_no");
@@ -107,14 +109,28 @@ namespace perception_hardware {
                                     continue;
                                 }
 
-                                // 3. 直接定位 Pose Sensor
+                                // 3. find all Sensors and match with each member variable
                                 auto sensors = dev_.query_sensors();
-                                for (auto&& s : sensors) {
-                                    if (s.is<rs2::pose_sensor>()) {
-                                        pose_sensor_ = s;
-                                        break;
+                                int sensor_count = 0;
+                                for (auto&& sensor : sensors) {
+                                    sensor_count++;
+                                    std::string sensor_name = sensor.get_info(RS2_CAMERA_INFO_NAME);\
+                                    RCLCPP_INFO(logger, "Sensor [%d] Found: %s", sensor_count, sensor_name.c_str());
+
+                                    if (sensor.is<rs2::depth_sensor>() || 
+                                    sensor.is<rs2::color_sensor>() ||
+                                    sensor.is<rs2::fisheye_sensor>()) {
+                                        RCLCPP_INFO(logger, "Depth, Color, or Fisheye Sensor Found: %s", sensor.get_info(RS2_CAMERA_INFO_NAME));
+                                    }
+                                    else if (sensor.is<rs2::pose_sensor>()) {
+                                        RCLCPP_INFO(logger, "Pose Sensor Found: %s", sensor.get_info(RS2_CAMERA_INFO_NAME));
+                                        pose_sensor_ = sensor;
+                                    }
+                                    else {
+                                        RCLCPP_WARN(logger, "Unknown Sensor Type: %s", sensor.get_info(RS2_CAMERA_INFO_NAME));
                                     }
                                 }
+                                RCLCPP_INFO(logger, "Total Sensors Found: %d", sensor_count);
 
                                 if (!pose_sensor_) {
                                     RCLCPP_ERROR(logger, "Could not find Pose Sensor on this device!");
@@ -125,6 +141,26 @@ namespace perception_hardware {
                                 // 4. 获取并配置 Pose Profile
                                 auto profiles = pose_sensor_.get_stream_profiles();
                                 rs2::stream_profile pose_profile;
+
+                                std::vector<rs2::stream_profile> target_profiles;
+                                sensor_count=0;
+                                for (auto& profile : profiles) {
+                                    sensor_count++;
+                                    if (profile.stream_type() == RS2_STREAM_POSE && profile.format() == RS2_FORMAT_6DOF) {
+                                        target_profiles.push_back(profile);
+                                    }
+                                    if (profile.stream_type() == RS2_STREAM_FISHEYE && profile.stream_index() == 1) {
+                                        target_profiles.push_back(profile);
+                                    }
+                                    if (profile.stream_type() == RS2_STREAM_FISHEYE && profile.stream_index() == 2) {
+                                        target_profiles.push_back(profile);
+                                    }
+                                    if (profile.stream_type() == RS2_STREAM_GYRO || profile.stream_type() == RS2_STREAM_ACCEL) {
+                                        target_profiles.push_back(profile);
+                                    }
+                                }
+                                RCLCPP_INFO(logger, "Total Pose Stream Profiles Found: %d", sensor_count);
+
                                 for (auto& p : profiles) {
                                     if (p.stream_type() == RS2_STREAM_POSE && p.format() == RS2_FORMAT_6DOF) {
                                         pose_profile = p;
@@ -137,27 +173,41 @@ namespace perception_hardware {
                                     continue;
                                 }
 
-                                // 5. 开启传感器 (Direct Open & Start)
-                                pose_sensor_.open(pose_profile);
-                                pose_sensor_.start([this](rs2::frame f) {
-                                    if (auto pf = f.as<rs2::pose_frame>()) {
-                                        auto pose = pf.get_pose_data();
+                                // 5. Direct Open & Start Pose Sensor
+                                pose_sensor_.open(target_profiles);
+                                pose_sensor_.start([this](rs2::frame f) {      
+                                    // if (auto pf = f.as<rs2::pose_frame>()) {                                        
+                                    //     auto pose = pf.get_pose_data();
 
-                                        // --- 坐标映射 (T265 -> ROS REP-103) ---
-                                        // T265: x=right, y=up, z=backward
-                                        // ROS: x=forward, y=left, z=up
-                                        data_.pose[0] = -pose.translation.z; // X
-                                        data_.pose[1] = -pose.translation.x; // Y
-                                        data_.pose[2] =  pose.translation.y; // Z
+                                    //     // --- 坐标映射 (T265 -> ROS REP-103) ---
+                                    //     // T265: x=right, y=up, z=backward
+                                    //     // ROS: x=forward, y=left, z=up
+                                    //     data_.pose[0] = -pose.translation.z; // X
+                                    //     data_.pose[1] = -pose.translation.x; // Y
+                                    //     data_.pose[2] =  pose.translation.y; // Z
 
-                                        // 四元数映射
-                                        data_.pose[3] =  pose.rotation.w;
-                                        data_.pose[4] = -pose.rotation.z;
-                                        data_.pose[5] = -pose.rotation.x;
-                                        data_.pose[6] =  pose.rotation.y;
+                                    //     // 四元数映射
+                                    //     data_.pose[3] =  pose.rotation.w;
+                                    //     data_.pose[4] = -pose.rotation.z;
+                                    //     data_.pose[5] = -pose.rotation.x;
+                                    //     data_.pose[6] =  pose.rotation.y;
 
-                                        data_.timestamp_nanos = static_cast<uint64_t>(pf.get_timestamp() * 1e6);
-                                    }
+                                    //     data_.timestamp_nanos = static_cast<uint64_t>(pf.get_timestamp() * 1e6);
+                                    // }
+                                    // else if(auto vf = f.as<rs2::video_frame>()) {
+                                    //     // todo: 左右鱼眼图像
+                                    //     int index = vf.get_profile().stream_index();
+                                    //     if(index == 1) {
+                                    //         data_.fisheye_left = vf;
+                                    //     }
+                                    //     else if(index == 2) {
+                                    //         data_.fisheye_right = vf;
+                                    //     }
+                                    // }
+
+                                    frame_callback(f);
+
+                                    
                                 });
 
                                 is_streaming_ = true;
