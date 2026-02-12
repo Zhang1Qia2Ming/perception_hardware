@@ -20,6 +20,7 @@ set(REALSENSE2_INCLUDE_DIRS "/usr/local/include")
 # 注意：如果你的 MockCamera 或 DeviceFactory 有单独的 .cpp 文件，也要加在这里
 add_library(${PROJECT_NAME} SHARED
   src/perception_hardware/perception_system.cpp
+  src/perception_hardware/t265_camera_device.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

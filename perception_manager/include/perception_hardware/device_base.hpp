@@ -9,6 +9,8 @@
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
 
+#include "rclcpp/rclcpp.hpp"
+
 namespace perception_hardware
 {
 
