@@ -4,9 +4,11 @@
 #include <cstdint>
 #include <opencv2/opencv.hpp>
 
+#include "mock_device/mock_camera_data.hpp"
+
 namespace perception_hardware {
 
-    struct alignas(64) T265CameraData
+    struct alignas(64) TestT265CameraData
     {
         /* data */
         cv::Mat fisheye_left;
@@ -23,6 +25,15 @@ namespace perception_hardware {
 
         char frame_id[64];
         double reserved[4];
+    };
+
+    struct alignas(64) T265CameraData
+    {
+        CameraDataFrame fisheye_left;
+        CameraDataFrame fisheye_right;
+        IMUDataFrame imu;
+        PoseDataFrame pose;
+
     };
     
 } // namespace perception_hardware

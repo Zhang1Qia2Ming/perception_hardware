@@ -25,6 +25,28 @@ namespace perception_hardware {
         
     };
 
+    struct CameraFrame {
+        uint64_t timestamp_nanos;
+        char frame_id[64];
+        uint32_t height;
+        uint32_t width;
+        cv::Mat image;
+    };
+
+    struct IMUDataFrame {
+        uint64_t timestamp_nanos;
+        char frame_id[64];
+        double linear_acceleration[3];
+        double angular_velocity[3];
+    };
+
+    struct PoseFrame {
+        uint64_t timestamp_nanos;
+        char frame_id[64];
+        double position[3];
+        double orientation[4];
+    };
+
 }
 
 #endif
