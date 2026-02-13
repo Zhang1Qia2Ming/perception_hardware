@@ -25,7 +25,7 @@ namespace perception_hardware {
         
     };
 
-    struct CameraFrame {
+    struct CameraDataFrame {
         uint64_t timestamp_nanos;
         char frame_id[64];
         uint32_t height;
@@ -40,7 +40,7 @@ namespace perception_hardware {
         double angular_velocity[3];
     };
 
-    struct PoseFrame {
+    struct PoseDataFrame {
         uint64_t timestamp_nanos;
         char frame_id[64];
         double position[3];
