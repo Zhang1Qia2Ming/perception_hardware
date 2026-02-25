@@ -24,6 +24,7 @@ namespace perception_hardware {
         public:
             bool on_init(const hardware_interface::ComponentInfo & info) override {
                 name_ = info.name;
+                RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"), "Initializing MockCameraDevice: %s", name_.c_str());
                 try {
                     video_device_ = info.parameters.at("video_device");
                     image_width_ = std::stoi(info.parameters.at("image_width"));

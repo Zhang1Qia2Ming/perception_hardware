@@ -205,7 +205,7 @@ namespace perception_hardware {
                                     //     }
                                     // }
 
-                                    frame_callback(f);
+                                    // frame_callback(f);
 
                                     
                                 });
