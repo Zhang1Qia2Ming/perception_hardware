@@ -37,15 +37,17 @@ namespace perception_hardware {
     struct IMUDataFrame {
         std::atomic<uint64_t> timestamp_nanos{0};
         char frame_id[64];
-        double linear_acceleration[3];
-        double angular_velocity[3];
+        double gyro[3];
+        double accel[3];
     };
 
     struct PoseDataFrame {
         std::atomic<uint64_t> timestamp_nanos{0};
         char frame_id[64];
-        double position[3];
-        double orientation[4];
+        double translation[3];
+        double rotation[3];
+        double velocity[3];
+        double angular_velocity[3];
     };
 
 }

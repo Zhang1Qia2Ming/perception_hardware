@@ -62,6 +62,8 @@ namespace perception_hardware {
 
             void frame_callback(const rs2::frame& f);
 
+            void data_callback(const rs2::frame& f);
+
         public:
             bool on_init(const hardware_interface::ComponentInfo & info) override {
                 name_ = info.name;
@@ -176,36 +178,10 @@ namespace perception_hardware {
                                 // 5. Direct Open & Start Pose Sensor
                                 pose_sensor_.open(target_profiles);
                                 pose_sensor_.start([this](rs2::frame f) {      
-                                    // if (auto pf = f.as<rs2::pose_frame>()) {                                        
-                                    //     auto pose = pf.get_pose_data();
-
-                                    //     // --- 坐标映射 (T265 -> ROS REP-103) ---
-                                    //     // T265: x=right, y=up, z=backward
-                                    //     // ROS: x=forward, y=left, z=up
-                                    //     data_.pose[0] = -pose.translation.z; // X
-                                    //     data_.pose[1] = -pose.translation.x; // Y
-                                    //     data_.pose[2] =  pose.translation.y; // Z
-
-                                    //     // 四元数映射
-                                    //     data_.pose[3] =  pose.rotation.w;
-                                    //     data_.pose[4] = -pose.rotation.z;
-                                    //     data_.pose[5] = -pose.rotation.x;
-                                    //     data_.pose[6] =  pose.rotation.y;
-
-                                    //     data_.timestamp_nanos = static_cast<uint64_t>(pf.get_timestamp() * 1e6);
-                                    // }
-                                    // else if(auto vf = f.as<rs2::video_frame>()) {
-                                    //     // todo: 左右鱼眼图像
-                                    //     int index = vf.get_profile().stream_index();
-                                    //     if(index == 1) {
-                                    //         data_.fisheye_left = vf;
-                                    //     }
-                                    //     else if(index == 2) {
-                                    //         data_.fisheye_right = vf;
-                                    //     }
-                                    // }
-
+                                    
                                     // frame_callback(f);
+
+                                    data_callback(f);
 
                                     
                                 });
