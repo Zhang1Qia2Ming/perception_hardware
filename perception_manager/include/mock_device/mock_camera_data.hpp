@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <cstdint>
+#include <atomic>
 
 namespace perception_hardware {
 
@@ -26,7 +27,7 @@ namespace perception_hardware {
     };
 
     struct CameraDataFrame {
-        uint64_t timestamp_nanos;
+        std::atomic<uint64_t> timestamp_nanos{0};
         char frame_id[64];
         uint32_t height;
         uint32_t width;
@@ -34,14 +35,14 @@ namespace perception_hardware {
     };
 
     struct IMUDataFrame {
-        uint64_t timestamp_nanos;
+        std::atomic<uint64_t> timestamp_nanos{0};
         char frame_id[64];
         double linear_acceleration[3];
         double angular_velocity[3];
     };
 
     struct PoseDataFrame {
-        uint64_t timestamp_nanos;
+        std::atomic<uint64_t> timestamp_nanos{0};
         char frame_id[64];
         double position[3];
         double orientation[4];

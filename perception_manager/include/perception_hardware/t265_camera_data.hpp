@@ -29,8 +29,8 @@ namespace perception_hardware {
 
     struct alignas(64) T265CameraData
     {
-        CameraDataFrame fisheye_left;
-        CameraDataFrame fisheye_right;
+        CameraDataFrame fisheye_left;  // left fisheye image - 0
+        CameraDataFrame fisheye_right; // right fisheye image - 1
         IMUDataFrame imu;
         PoseDataFrame pose;
 
