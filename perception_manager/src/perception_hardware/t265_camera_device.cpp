@@ -41,6 +41,7 @@ namespace perception_hardware {
             data_.pose.rotation[0] = pose_data.rotation.x;
             data_.pose.rotation[1] = pose_data.rotation.y;
             data_.pose.rotation[2] = pose_data.rotation.z;
+            data_.pose.rotation[3] = pose_data.rotation.w;
             data_.pose.velocity[0] = pose_data.velocity.x;
             data_.pose.velocity[1] = pose_data.velocity.y;
             data_.pose.velocity[2] = pose_data.velocity.z;
@@ -102,3 +103,18 @@ namespace perception_hardware {
     //         algo.process_accel(accel_data);
     //     }
     // });
+
+
+    // auto pose = f.get_pose_data();
+    //     std::stringstream ss;
+    //     ss << "Pos (meter): \t\t" << std::fixed << std::setprecision(2) << pose.translation.x << ", " << pose.translation.y << ", " << pose.translation.z;
+    //     draw_text(int(0.05f * r.w), int(0.2f * r.h), ss.str().c_str());
+    //     ss.clear(); ss.str("");
+    //     ss << "Orient (quaternion): \t" << pose.rotation.x << ", " << pose.rotation.y << ", " << pose.rotation.z << ", " << pose.rotation.w;
+    //     draw_text(int(0.05f * r.w), int(0.3f * r.h), ss.str().c_str());
+    //     ss.clear(); ss.str("");
+    //     ss << "Lin Velocity (m/sec): \t" << pose.velocity.x << ", " << pose.velocity.y << ", " << pose.velocity.z;
+    //     draw_text(int(0.05f * r.w), int(0.4f * r.h), ss.str().c_str());
+    //     ss.clear(); ss.str("");
+    //     ss << "Ang. Velocity (rad/sec): \t" << pose.angular_velocity.x << ", " << pose.angular_velocity.y << ", " << pose.angular_velocity.z;
+    //     draw_text(int(0.05f * r.w), int(0.5f * r.h), ss.str().c_str());

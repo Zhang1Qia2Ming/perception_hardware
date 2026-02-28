@@ -45,7 +45,7 @@ namespace perception_hardware {
         std::atomic<uint64_t> timestamp_nanos{0};
         char frame_id[64];
         double translation[3];
-        double rotation[3];
+        double rotation[4];
         double velocity[3];
         double angular_velocity[3];
     };
