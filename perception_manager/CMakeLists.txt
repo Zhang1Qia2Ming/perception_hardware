@@ -12,6 +12,8 @@ find_package(pluginlib REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 set(REALSENSE2_LIBRARY "/usr/local/lib/librealsense2.so")
 set(REALSENSE2_INCLUDE_DIRS "/usr/local/include")
@@ -39,6 +41,8 @@ ament_target_dependencies(${PROJECT_NAME}
   OpenCV
   cv_bridge
   sensor_msgs
+  nav_msgs
+  geometry_msgs
 )
 
 target_link_libraries(${PROJECT_NAME} ${REALSENSE2_LIBRARY})

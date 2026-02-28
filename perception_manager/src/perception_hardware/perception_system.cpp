@@ -1,5 +1,6 @@
 #include "perception_hardware/perception_system.hpp"
 #include "perception_hardware/device_factory.hpp"
+#include "perception_hardware/base_types.hpp"
 
 namespace perception_hardware
 {
