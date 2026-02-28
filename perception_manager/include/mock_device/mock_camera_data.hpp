@@ -18,7 +18,7 @@ namespace perception_hardware {
         cv::Mat image;
 
         double intrinsics[4];
-        uint64_t timestamp_nanos;
+        std::atomic<uint64_t> timestamp_nanos{0};
 
         char frame_id[64];
         
