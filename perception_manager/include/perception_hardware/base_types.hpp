@@ -25,6 +25,10 @@ struct TopicSync {
         std::mutex mtx;
         std::condition_variable cv;
         bool has_new_data = false;
+
+        TopicSync() = default;
+        TopicSync(const TopicSync&) = delete;
+        TopicSync& operator=(const TopicSync&) = delete;
 };
 
 struct BaseMember {
@@ -36,7 +40,7 @@ struct BaseMember {
         bool enable = false;
 
         std::map<std::string, uint64_t> last_ts;
-        std::unordered_map<std::string, TopicSync> topic_sync_map;
+        std::unordered_map<std::string, std::shared_ptr<TopicSync>> topic_sync_map;
 
         using ImagePub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Image>::SharedPtr;
         using ImuPub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Imu>::SharedPtr;
@@ -47,6 +51,10 @@ struct BaseMember {
         std::map<std::string, ImagePub> pub_rect;
         std::map<std::string, ImuPub> pub_imu;
         std::map<std::string, PosePub> pub_pose;
+
+        void add_topic_sync(const std::string & topic_name) {
+                topic_sync_map[topic_name] = std::make_shared<TopicSync>();
+        }
 };
 
 struct HighPerformanceMember : public BaseMember {

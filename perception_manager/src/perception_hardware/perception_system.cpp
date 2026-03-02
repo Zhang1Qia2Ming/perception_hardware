@@ -56,12 +56,25 @@ hardware_interface::CallbackReturn PerceptionSystem::on_configure(
 hardware_interface::CallbackReturn PerceptionSystem::on_activate(
     const rclcpp_lifecycle::State & previous_state)
 {
+    RCLCPP_INFO(rclcpp::get_logger("PerceptionSystem"), "Activating PerceptionSystem devices...");
+
+    for(auto & device : devices_){
+        device->start();
+        RCLCPP_INFO(rclcpp::get_logger("PerceptionSystem"), "Device thread %s activated", device->get_name().c_str());
+    }
+    
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 hardware_interface::CallbackReturn PerceptionSystem::on_deactivate(
     const rclcpp_lifecycle::State & previous_state)
 {
+    RCLCPP_INFO(rclcpp::get_logger("PerceptionSystem"), "Deactivating PerceptionSystem devices...");
+
+    for(auto & device : devices_){
+        device->stop();
+    }
+    
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 

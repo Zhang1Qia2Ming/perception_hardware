@@ -1,6 +1,7 @@
 #include "perception_hardware/device_base.hpp"
 #include "mock_device/mock_camera_data.hpp"
 
+#include <perception_hardware/base_types.hpp>
 #include <opencv2/opencv.hpp>
 
 namespace perception_hardware {
@@ -69,6 +70,27 @@ namespace perception_hardware {
                 //                      name_.c_str(), data_ptr_address_);
 
                 return true;
+            }
+
+            void run_loop() override {
+                cv::Mat frame;
+                while (is_running_.load())
+                {
+                    if(cap_.read(frame) && !frame.empty()) {
+                        cv::Mat processed_frame;
+                        cv::rotate(frame, processed_frame, cv::ROTATE_180);
+                        // data_.timestamp_nanos = time.nanoseconds();
+                    }
+
+                    //
+                    {
+                        std::lock_guard<std::mutex> lock(data_mutex_);
+                        processed_frame.copyTo(data_.image);
+                        data_.timestamp_nanos = time.nanoseconds();
+
+                        
+                    }
+                }                
             }
 
             void read(const rclcpp::Time & time, const rclcpp::Duration & period) override {
