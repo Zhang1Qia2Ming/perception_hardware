@@ -40,7 +40,7 @@ struct BaseMember {
         bool enable = false;
 
         std::map<std::string, uint64_t> last_ts;
-        std::unordered_map<std::string, std::shared_ptr<TopicSync>> topic_sync_map;
+        std::unordered_map<std::string, std::shared_ptr<TopicSync>> topic_sync_map;  // /topic_name -> sync
 
         using ImagePub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Image>::SharedPtr;
         using ImuPub = rclcpp_lifecycle::LifecyclePublisher<sensor_msgs::msg::Imu>::SharedPtr;
