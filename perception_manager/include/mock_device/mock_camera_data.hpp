@@ -14,7 +14,7 @@ namespace perception_hardware {
     //     uint64_t timestamp_nanos;
     // };
 
-    struct alignas(64) MockCameraData {
+    struct alignas(64) TestMockCameraData {
         cv::Mat image;
 
         double intrinsics[4];
@@ -48,6 +48,10 @@ namespace perception_hardware {
         double rotation[4];
         double velocity[3];
         double angular_velocity[3];
+    };
+
+    struct alignas(64) MockCameraData {
+        CameraDataFrame frame;
     };
 
 }

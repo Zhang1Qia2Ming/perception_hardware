@@ -1,8 +1,11 @@
 #include "perception_hardware/device_base.hpp"
 #include "mock_device/mock_camera_data.hpp"
+#include "perception_hardware/utils.hpp"
 
 #include <perception_hardware/base_types.hpp>
 #include <opencv2/opencv.hpp>
+
+#include <mutex>
 
 namespace perception_hardware {
 
@@ -12,6 +15,9 @@ namespace perception_hardware {
             cv::VideoCapture cap_;
             MockCameraData data_;
             double data_ptr_address_ = 0.0;
+            double member_ptr_address_ = 0.0;
+
+            std::mutex data_mutex_;
 
             // param
             std::string video_device_;
@@ -22,11 +28,18 @@ namespace perception_hardware {
             std::string camera_frame_id_;
             std::string output_mode_;
 
+            bool enable_ = false;
+        
+        public:
+            //std::shared_ptr<BaseMember> member_ptr_;
+
         public:
             bool on_init(const hardware_interface::ComponentInfo & info) override {
                 name_ = info.name;
                 RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"), "Initializing MockCameraDevice: %s", name_.c_str());
                 try {
+
+                    // hw params
                     video_device_ = info.parameters.at("video_device");
                     image_width_ = std::stoi(info.parameters.at("image_width"));
                     image_height_ = std::stoi(info.parameters.at("image_height"));
@@ -35,10 +48,25 @@ namespace perception_hardware {
                     camera_frame_id_ = info.parameters.at("camera_frame_id");
                     output_mode_ = info.parameters.at("output_mode");
 
-                    data_.intrinsics[0] = std::stod(info.parameters.at("fx"));
-                    data_.intrinsics[1] = std::stod(info.parameters.at("fy"));
-                    data_.intrinsics[2] = std::stod(info.parameters.at("cx"));
-                    data_.intrinsics[3] = std::stod(info.parameters.at("cy"));
+                    // data_.intrinsics[0] = std::stod(info.parameters.at("fx"));
+                    // data_.intrinsics[1] = std::stod(info.parameters.at("fy"));
+                    // data_.intrinsics[2] = std::stod(info.parameters.at("cx"));
+                    // data_.intrinsics[3] = std::stod(info.parameters.at("cy"));
+
+                    enable_ = (info.parameters.at("enable")=="true"||info.parameters.at("enable")=="1");
+
+                    // add in BaseMember
+                    member_ptr_ = std::make_shared<BaseMember>();
+                    member_ptr_->name = info.name;
+                    member_ptr_->device_type = info.parameters.at("device_type");
+                    member_ptr_->frame_id = info.parameters.at("camera_frame_id");
+                    member_ptr_->enable = enable_;
+                    member_ptr_->interface_name = info.parameters.at("interface_name");
+                    member_ptr_->sensor_components = split(info.parameters.at("sensor_components"), ';');
+                    
+                    add_pub_from_sensor_component_info(member_ptr_);
+
+                    print_info_in_member(member_ptr_);
 
                     cap_.open(video_device_, cv::CAP_V4L2);
                     if (!cap_.isOpened()) {
@@ -63,6 +91,7 @@ namespace perception_hardware {
                 }
 
                 data_ptr_address_ = static_cast<double>(reinterpret_cast<uintptr_t>(&data_));
+                member_ptr_address_ = static_cast<double>(reinterpret_cast<uintptr_t>(member_ptr_.get()));
                 
                 // 
                 // RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
@@ -77,28 +106,29 @@ namespace perception_hardware {
                 while (is_running_.load())
                 {
                     if(cap_.read(frame) && !frame.empty()) {
+                        // RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
+                        //              "Enter MockCameraDevice run_loop");
                         cv::Mat processed_frame;
                         cv::rotate(frame, processed_frame, cv::ROTATE_180);
-                        // data_.timestamp_nanos = time.nanoseconds();
+
+                        //
+                        {
+                            std::lock_guard<std::mutex> lock(data_mutex_);
+                            processed_frame.copyTo(data_.frame.image);
+                            data_.frame.timestamp_nanos = rclcpp::Clock().now().nanoseconds();                
+                        }
                     }
 
-                    //
-                    {
-                        std::lock_guard<std::mutex> lock(data_mutex_);
-                        processed_frame.copyTo(data_.image);
-                        data_.timestamp_nanos = time.nanoseconds();
-
-                        
-                    }
+                    
                 }                
             }
 
             void read(const rclcpp::Time & time, const rclcpp::Duration & period) override {
-                cv::Mat frame;
-                if(cap_.read(frame) && !frame.empty()) {
-                    cv::rotate(frame, data_.image, cv::ROTATE_180);
-                    data_.timestamp_nanos = time.nanoseconds();
-                }
+                // cv::Mat frame;
+                // if(cap_.read(frame) && !frame.empty()) {
+                //     cv::rotate(frame, data_.image, cv::ROTATE_180);
+                //     data_.timestamp_nanos = time.nanoseconds();
+                // }
 
                 // RCLCPP_INFO(rclcpp::get_logger("MockCameraDevice"),
                 //                      "Raw Buffer Address: %p", 
@@ -135,7 +165,11 @@ namespace perception_hardware {
             }
 
             std::vector<hardware_interface::StateInterface> export_state_interfaces() override {
-                return { hardware_interface::StateInterface(name_, "data_ptr", &data_ptr_address_) };
+                std::vector<hardware_interface::StateInterface> state_interfaces;
+                state_interfaces.emplace_back(hardware_interface::StateInterface(name_, "data_ptr", &data_ptr_address_));
+                state_interfaces.emplace_back(hardware_interface::StateInterface(name_, "member_ptr", &member_ptr_address_));
+                
+                return state_interfaces;
             }
 
             std::vector<hardware_interface::CommandInterface> export_command_interfaces() override {

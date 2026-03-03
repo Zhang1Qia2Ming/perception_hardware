@@ -1,5 +1,7 @@
 #include "perception_hardware/device_base.hpp"
 #include "perception_hardware/t265_camera_data.hpp"
+#include "perception_hardware/base_types.hpp"
+#include "perception_hardware/utils.hpp"
 
 #include <rclcpp/rclcpp.hpp>
 #include <librealsense2/rs.hpp>
@@ -18,6 +20,7 @@ namespace perception_hardware {
             std::string name_;
             T265CameraData data_;
             double data_ptr_address_ = 0.0;
+            double member_ptr_address_ = 0.0;
 
             // RealSense core component
             rs2::device dev_;
@@ -27,6 +30,8 @@ namespace perception_hardware {
             // rs2::config cfg_;
 
             // param and state
+            bool enable_{false};
+
             std::string serial_no_;
             std::string usb_port_id_;
             std::string device_type_;
@@ -76,6 +81,21 @@ namespace perception_hardware {
 
                     is_alive_ = true;
                     is_streaming_ = false;
+
+                    enable_ = (info.parameters.at("enable")=="true"||info.parameters.at("enable")=="1");
+
+
+                    member_ptr_ = std::make_shared<BaseMember>();
+                    member_ptr_->name = name_;
+                    member_ptr_->device_type = info.parameters.at("device_type");
+                    member_ptr_->frame_id = info.parameters.at("frame_id");
+                    member_ptr_->enable = enable_;
+                    member_ptr_->interface_name = info.parameters.at("interface_name");
+                    member_ptr_->sensor_components = split(info.parameters.at("sensor_components"), ';');
+
+                    add_pub_from_sensor_component_info(member_ptr_);
+
+                    print_info_in_member(member_ptr_);
 
                     query_thread_ = std::thread([this, logger]() {
                         RCLCPP_INFO(logger, "T265 Direct Sensor thread started.");
@@ -203,7 +223,13 @@ namespace perception_hardware {
                 }
 
                 data_ptr_address_ = static_cast<double>(reinterpret_cast<uintptr_t>(&data_));
+                member_ptr_address_ = static_cast<double>(reinterpret_cast<uintptr_t>(member_ptr_.get()));
+
                 return true;
+            }
+
+            void run_loop() {
+                
             }
 
             void read(const rclcpp::Time & time, const rclcpp::Duration & period) override {}
@@ -211,9 +237,10 @@ namespace perception_hardware {
             void write(const rclcpp::Time & time, const rclcpp::Duration & period) override {}
 
             std::vector<hardware_interface::StateInterface> export_state_interfaces() override {
-                return {
-                    hardware_interface::StateInterface(name_, "data_ptr", &data_ptr_address_),
-                };
+                std::vector<hardware_interface::StateInterface> state_interfaces;
+                state_interfaces.emplace_back(hardware_interface::StateInterface(name_, "data_ptr", &data_ptr_address_));
+                state_interfaces.emplace_back(hardware_interface::StateInterface(name_, "member_ptr", &member_ptr_address_));
+                return state_interfaces;
             }
 
             std::vector<hardware_interface::CommandInterface> export_command_interfaces() override {

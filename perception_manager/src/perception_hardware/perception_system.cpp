@@ -109,9 +109,9 @@ std::vector<hardware_interface::CommandInterface> PerceptionSystem::export_comma
 hardware_interface::return_type PerceptionSystem::read(
     const rclcpp::Time & time, const rclcpp::Duration & period)
 {
-    for(auto & device : devices_){
-        device->read(time, period);
-    }
+    // for(auto & device : devices_){
+    //     device->read(time, period);
+    // }
     
     return hardware_interface::return_type::OK;
 }

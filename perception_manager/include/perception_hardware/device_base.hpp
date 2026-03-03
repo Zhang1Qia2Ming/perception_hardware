@@ -8,8 +8,9 @@
 
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
-
+#include "perception_hardware/base_types.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/logger.hpp"
 
 namespace perception_hardware
 {
@@ -24,7 +25,8 @@ public:
 
   //async function
   virtual void start() {
-    if(!is_running_.exchange(true)) {
+    // RCLCPP_INFO(rclcpp::get_logger("DeviceBase"), "Here!!!Start function :%s", get_name().c_str());
+    if(is_running_.exchange(true)) {
       return;
     }
     work_thread_ = std::thread(&DeviceBase::run_loop, this);
@@ -52,6 +54,10 @@ public:
   virtual std::vector<hardware_interface::CommandInterface> export_command_interfaces() = 0;
 
   virtual std::string get_name() const = 0;
+
+public:
+  // base member pointer
+  std::shared_ptr<BaseMember> member_ptr_;
 
 protected:
   std::atomic<bool> is_running_{false};
